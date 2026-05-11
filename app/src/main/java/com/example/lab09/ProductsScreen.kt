@@ -133,3 +133,67 @@ fun ProductCard(product: ProductModel, navController: NavHostController) {
         }
     }
 }
+@Composable
+fun ProductDetailScreen(navController: NavHostController, productId: Int) {
+    var product by remember { mutableStateOf<ProductModel?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        try {
+            val response = DummyJSONClient.productApiService.getProductById(productId)
+            product = response
+            isLoading = false
+        } catch (e: Exception) {
+            errorMessage = e.message
+            isLoading = false
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        when {
+            isLoading -> {
+                CircularProgressIndicator()
+            }
+            errorMessage != null -> {
+                Text("Error: $errorMessage", color = MaterialTheme.colorScheme.error)
+            }
+            product != null -> {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    item {
+                        Image(
+                            painter = rememberAsyncImagePainter(product!!.thumbnail),
+                            contentDescription = product!!.title,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp)
+                                .clip(RoundedCornerShape(12.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
+
+                    item {
+                        Text(product!!.title, fontWeight = FontWeight.Bold, style = MaterialTheme.typography.headlineSmall)
+                        Text(product!!.brand, style = MaterialTheme.typography.bodyMedium)
+                        Text("Categoría: ${product!!.category}", style = MaterialTheme.typography.bodySmall)
+                    }
+
+                    item {
+                        Text("Descripción", fontWeight = FontWeight.Bold)
+                        Text(product!!.description)
+                    }
+
+                    item {
+                        Text("Precio: $${product!!.price}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text("Stock: ${product!!.stock} unidades")
+                        Text("Rating: ⭐ ${product!!.rating}")
+                    }
+                }
+            }
+        }
+    }
+}
