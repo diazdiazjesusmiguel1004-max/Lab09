@@ -10,6 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
+import com.example.lab09.model.PostModel
+import com.example.lab09.network.PostApiService
 import com.example.lab09.ui.theme.Lab09Theme
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -34,13 +36,16 @@ fun ProgPrincipal9() {
         .addConverterFactory(GsonConverterFactory.create())
         .build()
 
+    // 👇 CREAR INSTANCIA DEL SERVICIO (Paso 5.2.1)
+    val servicio = retrofit.create(PostApiService::class.java)
+
     val navController = rememberNavController()
 
     Scaffold(
         topBar = { BarraSuperior() },
         bottomBar = { BarraInferior(navController) },
         content = { paddingValues ->
-            Contenido(paddingValues, navController, retrofit)
+            Contenido(paddingValues, navController, servicio)
         }
     )
 }
@@ -56,8 +61,8 @@ fun BarraInferior(navController: Any) {
 }
 
 @Composable
-fun Contenido(paddingValues: androidx.compose.foundation.layout.PaddingValues, navController: Any, retrofit: Retrofit) {
-    Text(text = "Contenido principal")
+fun Contenido(paddingValues: androidx.compose.foundation.layout.PaddingValues, navController: Any, servicio: PostApiService) {
+    Text(text = "Contenido principal - Servicio listo")
 }
 
 @Preview(showBackground = true)
