@@ -3,13 +3,17 @@ package com.example.lab09
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.ShoppingCart
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -20,16 +24,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import androidx.navigation.NavHostController
 import com.example.lab09.model.PostModel
 import com.example.lab09.network.PostApiService
 import com.example.lab09.ui.theme.Lab09Theme
@@ -102,6 +109,12 @@ fun BarraInferior(navController: NavHostController) {
             selected = navController.currentDestination?.route == "posts",
             onClick = { navController.navigate("posts") }
         )
+        NavigationBarItem(
+            icon = { Icon(Icons.Outlined.ShoppingCart, contentDescription = "Productos") },
+            label = { Text("Productos") },
+            selected = navController.currentDestination?.route == "products",
+            onClick = { navController.navigate("products") }
+        )
     }
 }
 
@@ -118,7 +131,7 @@ fun Contenido(
     ) {
         NavHost(
             navController = navController,
-            startDestination = "inicio"
+            startDestination = "posts"
         ) {
             composable("inicio") { ScreenInicio() }
             composable("posts") { ScreenPosts(navController, servicio) }
@@ -128,23 +141,42 @@ fun Contenido(
                 val id = backStackEntry.arguments?.getInt("id") ?: 0
                 ScreenPost(navController, servicio, id)
             }
+            composable("products") { ProductsListScreen(navController) }
+            composable("productDetail/{id}", arguments = listOf(
+                navArgument("id") { type = NavType.IntType }
+            )) { backStackEntry ->
+                val id = backStackEntry.arguments?.getInt("id") ?: 0
+                ProductDetailScreen(navController, id)
+            }
         }
     }
 }
 
 @Composable
 fun ScreenInicio() {
-    Text("INICIO")
-}
-
-@Composable
-fun ScreenPosts(navController: NavHostController, servicio: PostApiService) {
-    Text("PANTALLA DE POSTS - Próximamente")
-}
-
-@Composable
-fun ScreenPost(navController: NavHostController, servicio: PostApiService, id: Int) {
-    Text("PANTALLA DE POST #$id - Próximamente")
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Bienvenido a Lab09",
+            fontWeight = FontWeight.Bold
+        )
+        Spacer(modifier = Modifier.padding(8.dp))
+        Text(
+            text = "App que consume JSONPlaceholder API",
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.padding(16.dp))
+        Text(
+            text = "Usa la barra inferior para navegar a Posts",
+            color = Color.Gray,
+            textAlign = TextAlign.Center
+        )
+    }
 }
 
 @Preview(showBackground = true)
